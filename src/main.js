@@ -16,7 +16,9 @@ const sceneThemes={
   tirtha:{color:0x4da6a6,emissive:0x073333,light:0x75e6d5,geometry:'torus'},
   vrata:{color:0xff9b62,emissive:0x431708,light:0xffc27d,geometry:'sphere'},
   texts:{color:0x8eb8ff,emissive:0x10284a,light:0x9cc7ff,geometry:'box'},
-  dharma:{color:0xc78cff,emissive:0x2b104a,light:0xd49cff,geometry:'icosa'}
+  dharma:{color:0xc78cff,emissive:0x2b104a,light:0xd49cff,geometry:'icosa'},
+  darshana:{color:0xffd27d,emissive:0x4a2a08,light:0xffe7a8,geometry:'torus'},
+  heritage:{color:0x9bc7ff,emissive:0x102b4a,light:0xb7dcff,geometry:'box'}
 };
 
 function destroy3D(){
@@ -104,8 +106,15 @@ function setup3D(mode='home'){
  animate();
 }
 
+const FAVORITES_KEY='sdd-favorites';
+const RECENT_KEY='sdd-recent';
+function getFavorites(){try{return JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]')}catch{return[]}}
+function setFavorites(v){localStorage.setItem(FAVORITES_KEY,JSON.stringify(v))}
+function getRecent(){try{return JSON.parse(localStorage.getItem(RECENT_KEY)||'[]')}catch{return[]}}
+function remember(id){const next=[id,...getRecent().filter(x=>x!==id)].slice(0,8);localStorage.setItem(RECENT_KEY,JSON.stringify(next))}
+function randomItem(){const all=sections.flatMap(s=>s.items.map(x=>({s,x})));return all[Math.floor(Math.random()*all.length)]||null}
 function renderHome(){
- app.innerHTML=`<main class="screen"><canvas id="scene"></canvas><section class="hero"><div class="om">ॐ</div><h1>Sanatan Divya Darshan</h1><p>सनातन परंपराओं की immersive digital यात्रा</p><div class="search-wrap"><input id="search" class="search" placeholder="🔎 लोक, भगवान, तीर्थ, पर्व या ग्रंथ खोजें..." autocomplete="off"/></div></section><section class="catalog">${sections.map(s=>`<button class="category" data-section="${s.id}"><span>${icons[s.id]}</span><b>${s.title}</b><small>${s.items.length} विषय • ज्ञान • दर्शन • परंपरा</small></button>`).join('')}</section><section id="search-results" class="search-results"></section><p class="note">यह ज्ञानकोश अलग-अलग ग्रंथों, संप्रदायों और क्षेत्रीय परंपराओं के मतभेदों को अलग-अलग दिखाने के लिए बनाया जा रहा है। धार्मिक/पारंपरिक दावों को जहाँ संभव हो, संबंधित ग्रंथ, संप्रदाय और क्षेत्रीय संदर्भ के साथ अलग-अलग दिखाया जाएगा।</p></main>`;
+ app.innerHTML=`<main class="screen"><canvas id="scene"></canvas><section class="hero"><div class="om">ॐ</div><h1>Sanatan Divya Darshan</h1><p>सनातन परंपराओं की immersive digital यात्रा</p><div class="search-wrap"><input id="search" class="search" placeholder="🔎 लोक, भगवान, तीर्थ, पर्व या ग्रंथ खोजें..." autocomplete="off"/></div></section><section class="catalog">${sections.map(s=>`<button class="category" data-section="${s.id}"><span>${icons[s.id]}</span><b>${s.title}</b><small>${s.items.length} विषय • ज्ञान • दर्शन • परंपरा</small></button>`).join('')}</section><section class="quick-tools"><button class="tool-card" id="daily-darshan">🌅<b>आज का दिव्य दर्शन</b><small>एक यादृच्छिक ज्ञान-दर्शन खोलें</small></button><button class="tool-card" id="favorites">❤️<b>मेरे प्रिय दर्शन</b><small>पसंद किए हुए विषय</small></button><button class="tool-card" id="recent">🕉️<b>हाल में देखे</b><small>पिछली यात्राएँ फिर खोलें</small></button></section><section id="search-results" class="search-results"></section><p class="note">यह ज्ञानकोश अलग-अलग ग्रंथों, संप्रदायों और क्षेत्रीय परंपराओं के मतभेदों को अलग-अलग दिखाने के लिए बनाया जा रहा है। धार्मिक/पारंपरिक दावों को जहाँ संभव हो, संबंधित ग्रंथ, संप्रदाय और क्षेत्रीय संदर्भ के साथ अलग-अलग दिखाया जाएगा।</p></main>`;
  setup3D();
  document.querySelectorAll('[data-section]').forEach(b=>b.onclick=()=>navigate('section',b.dataset.section));
  const search=document.querySelector('#search');
@@ -128,7 +137,17 @@ function renderSection(id){
  document.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.id));
 }
 
+function showSaved(kind){
+ const ids=kind==='favorites'?getFavorites():getRecent();
+ const title=kind==='favorites'?'❤️ मेरे प्रिय दर्शन':'🕉️ हाल में देखे';
+ const items=ids.map(id=>detail(id)).filter(Boolean);
+ app.innerHTML='<main class="detail"><button class="back" id="back">← वापस</button><div class="section-icon">'+(kind==='favorites'?'❤️':'🕉️')+'</div><h1>'+title+'</h1><div class="list">'+(items.length?items.map(x=>'<button class="item" data-id="'+x.id+'"><span>✨</span><div><b>'+x.title+'</b><small>'+x.section+' • '+x.summary+'</small></div><strong>›</strong></button>').join(''):'<p class="no-results">अभी यहाँ कोई दर्शन नहीं है।</p>')+'</div></main>';
+ document.querySelector('#back').onclick=()=>history.back();
+ document.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.id));
+}
+
 function renderDetail(id){
+ remember(id);
  const p=detail(id)||detail('vishnu');
  const rich=getDetails(p.id)||{};
  const sceneMeta=getSceneMeta(p.id)||{label:'दिव्य प्रतीकात्मक दृश्य',confidence:'conceptual'};
@@ -140,8 +159,10 @@ function renderDetail(id){
    p.section.includes('देवी-देवता')?'deity':
    p.section.includes('तीर्थ')?'tirtha':
    p.section.includes('व्रत')?'vrata':
-   p.section.includes('ग्रंथ')?'texts':'dharma';
- app.innerHTML=`<main class="detail"><button class="back" id="back">← वापस</button><canvas id="scene"></canvas><div class="detail-content"><div class="darshan-badge">✦ स्पर्श / क्लिक करके 3D दर्शन अनुभव करें</div><div class="section-icon">✨</div><h1>${p.title}</h1><p class="subtitle">${p.section}</p><article><h2>दिव्य परिचय</h2><p>${overview}</p><div class="detail-grid"><section class="info-card"><h2>📜 प्रमुख स्रोत</h2><ul>${sourceList}</ul></section><section class="info-card"><h2>📖 प्रमुख कथाएँ</h2><ul>${storyList}</ul></section></div><h2>परंपरा / संदर्भ</h2><p>${p.tradition||'विभिन्न ग्रंथ और संप्रदाय अपने-अपने संदर्भ में इस विषय की व्याख्या करते हैं।'}</p><h2>उपासना और अनुभव</h2><p>${rich.worship||'इस विषय की उपासना और परंपराएँ क्षेत्र, संप्रदाय और मंदिर के अनुसार अलग हो सकती हैं।'}</p><section class="info-card"><h2>✨ 3D दर्शन</h2><p>${sceneMeta.label}</p><p>दृश्य की प्रकृति: \${sceneMeta.confidence === "conceptual" ? "प्रतीकात्मक/कल्पनात्मक — इसे ऐतिहासिक या शास्त्रीय वास्तु का प्रमाणित पुनर्निर्माण न समझें।" : "स्रोत-आधारित दृश्य।"}</p><p>स्पर्श/क्लिक से motion और visual response सक्रिय होता है। आगे जहाँ विश्वसनीय वास्तु/प्रतिमा-स्रोत उपलब्ध होंगे, वहाँ scene-specific hotspots और संरचनात्मक विवरण जोड़े जाएंगे।</p></section>${related.length?'<h2>🔗 संबंधित दर्शन</h2><div class="related-grid">'+related.map(x=>'<button class="search-item related-item" data-related="'+x.id+'"><b>'+x.title+'</b><small>'+x.summary+'</small></button>').join('')+'</div>':''}<h2>स्रोत-संदर्भ</h2><p>${p.sources||'प्राथमिक ग्रंथ और विश्वसनीय संस्थागत/शोध स्रोतों के आधार पर विस्तार किया जाएगा।'}</p><h2>परंपरा में विविधता</h2><p>जहाँ अलग-अलग ग्रंथ, संप्रदाय या क्षेत्र अलग विवरण देते हैं, उन्हें एक ही तथ्य की तरह मिलाने के बजाय अलग-अलग परंपराओं के रूप में प्रस्तुत किया जाएगा।</p></article></div></main>`;
+   p.section.includes('ग्रंथ')?'texts':
+   p.section.includes('तत्त्व, योग')?'darshana':
+   p.section.includes('मंदिर, कला')?'heritage':'dharma';
+ app.innerHTML=`<main class="detail"><button class="back" id="back">← वापस</button><canvas id="scene"></canvas><div class="detail-content"><div class="darshan-badge">✦ स्पर्श / क्लिक करके 3D दर्शन अनुभव करें</div><div class="section-icon">✨</div><h1>${p.title}</h1><div class="detail-actions"><button id="fav-btn">🤍 प्रिय में जोड़ें</button><button id="share-btn">🔗 साझा करें</button></div><p class="subtitle">${p.section}</p><article><h2>दिव्य परिचय</h2><p>${overview}</p><div class="detail-grid"><section class="info-card"><h2>📜 प्रमुख स्रोत</h2><ul>${sourceList}</ul></section><section class="info-card"><h2>📖 प्रमुख कथाएँ</h2><ul>${storyList}</ul></section></div><h2>परंपरा / संदर्भ</h2><p>${p.tradition||'विभिन्न ग्रंथ और संप्रदाय अपने-अपने संदर्भ में इस विषय की व्याख्या करते हैं।'}</p><h2>उपासना और अनुभव</h2><p>${rich.worship||'इस विषय की उपासना और परंपराएँ क्षेत्र, संप्रदाय और मंदिर के अनुसार अलग हो सकती हैं।'}</p><section class="info-card"><h2>✨ 3D दर्शन</h2><p>${sceneMeta.label}</p><p>दृश्य की प्रकृति: \${sceneMeta.confidence === "conceptual" ? "प्रतीकात्मक/कल्पनात्मक — इसे ऐतिहासिक या शास्त्रीय वास्तु का प्रमाणित पुनर्निर्माण न समझें।" : "स्रोत-आधारित दृश्य।"}</p><p>स्पर्श/क्लिक से motion और visual response सक्रिय होता है। आगे जहाँ विश्वसनीय वास्तु/प्रतिमा-स्रोत उपलब्ध होंगे, वहाँ scene-specific hotspots और संरचनात्मक विवरण जोड़े जाएंगे।</p></section>${related.length?'<h2>🔗 संबंधित दर्शन</h2><div class="related-grid">'+related.map(x=>'<button class="search-item related-item" data-related="'+x.id+'"><b>'+x.title+'</b><small>'+x.summary+'</small></button>').join('')+'</div>':''}<h2>स्रोत-संदर्भ</h2><p>${p.sources||'प्राथमिक ग्रंथ और विश्वसनीय संस्थागत/शोध स्रोतों के आधार पर विस्तार किया जाएगा।'}</p><h2>परंपरा में विविधता</h2><p>जहाँ अलग-अलग ग्रंथ, संप्रदाय या क्षेत्र अलग विवरण देते हैं, उन्हें एक ही तथ्य की तरह मिलाने के बजाय अलग-अलग परंपराओं के रूप में प्रस्तुत किया जाएगा।</p></article></div></main>`;
  setup3D(mode);
  document.querySelector('#back').onclick=()=>history.back();
  document.querySelectorAll('[data-related]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.related));
