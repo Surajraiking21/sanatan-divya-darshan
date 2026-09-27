@@ -7,7 +7,7 @@ const app=document.querySelector('#app');
 let scene,camera,renderer,raf;
 let resizeHandler=null;
 let pointerHandler=null;
-const icons={loka:'🌌',deities:'🪔',tirtha:'🛕',vrata:'📿',texts:'📜',dharma:'☸️'};
+const icons={loka:'🌌',deities:'🪔',tirtha:'🛕',vrata:'📿',texts:'📜',dharma:'☸️',darshana:'🕉️',heritage:'🏛️'};
 
 const sceneThemes={
   home:{color:0x8e73ff,emissive:0x25124a,light:0xb58cff,geometry:'icosa'},
