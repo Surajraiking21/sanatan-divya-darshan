@@ -55,3 +55,5 @@
 .detail-section-card>div{padding:0 18px 16px;color:inherit}
 .detail-section-card p{margin:0;line-height:1.75}
 @media(max-width:560px){.topic-meta{justify-content:flex-start}.topic-chip{font-size:.76rem}.detail-section-card summary{padding:14px}.detail-section-card>div{padding:0 14px 14px}}
+
+.timeline-mini{display:grid;gap:12px}.timeline-mini>div{padding:14px 16px;border-left:3px solid #f5dca8;border-radius:0 14px 14px 0;background:#ffffff08}.timeline-mini b{color:#f5dca8}.timeline-mini p{margin:5px 0 0;line-height:1.7;opacity:.82}.visual-hero small+small{margin-top:5px}
