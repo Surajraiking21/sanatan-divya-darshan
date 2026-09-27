@@ -45,6 +45,19 @@ jobs:
       - name: Create Android project
         run: npx cap add android
 
+      - name: Apply branded Android icon
+        run: |
+          mkdir -p android/app/src/main/res/drawable
+          convert -background none public/app-icon.svg -resize 512x512 android/app/src/main/res/drawable/ic_launcher.png
+          python - <<'PY'
+          from pathlib import Path
+          p=Path("android/app/src/main/AndroidManifest.xml")
+          s=p.read_text()
+          s=s.replace('android:icon="@mipmap/ic_launcher"', 'android:icon="@drawable/ic_launcher"')
+          s=s.replace('android:roundIcon="@mipmap/ic_launcher_round"', 'android:roundIcon="@drawable/ic_launcher"')
+          p.write_text(s)
+          PY
+
       - name: Sync Capacitor
         run: npx cap sync android
 
