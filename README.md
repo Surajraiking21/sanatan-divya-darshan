@@ -1,12 +1,27 @@
-# Sanatan Divya Darshan
+# Sanatan Divya Darshan 🕉️
 
-An immersive 3D-style spiritual exploration app for Sanatan traditions, sacred lokas, deities, temples and pilgrimage places.
+**Vision:** a large, respectful, source-aware digital knowledge and immersive 3D experience for Sanatan traditions.
 
-## Vision
-- Explore sacred lokas and divine realms through an immersive interface.
-- Discover deities, temples, tirthas, stories, traditions and detailed explanations.
-- Mobile-first experience with 3D visual scenes.
-- Android Back button and browser history return to the previous view instead of unexpectedly exiting.
-- Content is data-driven so more traditions and places can be added safely.
+## Roadmap
+- Sanatan fundamentals, dharma, karma, yoga, moksha and samskaras
+- Lokas and divine realms across textual traditions
+- Deities, devatas, devis, avatars, rishis, ganas and regional traditions
+- Temples, tirthas, dhamas, pilgrimage routes and sacred geography
+- Vrata, festivals and Hindu calendar
+- Vedas, Upanishads, Itihasa, Gita, Puranas and darshana
+- Shaiva, Vaishnava, Shakta, Smarta, Saura, Ganapatya and regional traditions
+- Immersive 3D-style scenes and interactive knowledge hotspots
+- Android Back-stack navigation
+- Android APK/AAB build pipeline
 
-Descriptions will distinguish traditional/scriptural accounts from modern interpretations where relevant.
+## Content principles
+This project will not pretend that one list represents every Hindu tradition. Where scriptures, sampradayas or regions differ, the app will show the tradition/source context and distinguish documented history from devotional or traditional descriptions.
+
+The catalogue is designed to grow in phases rather than inventing unsupported details. Government tourism material is one useful source for pilgrimage and festival discovery, while primary texts and reputable institutional/temple sources should be preferred for religious claims. citeturn0search0turn0search3
+
+## Development
+```bash
+npm install
+npm run dev
+npm run build
+```
