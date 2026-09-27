@@ -9,9 +9,15 @@ let resizeHandler=null;
 let pointerHandler=null;
 
 const sacredRoutes=[
- {id:'char-dham',title:'चार धाम',icon:'🛕',items:['बद्रीनाथ','द्वारका','जगन्नाथ पुरी','रामेश्वरम्'],note:'चार प्रमुख धामों की परंपरा को एक यात्रा-दृश्य में देखें।'},
- {id:'jyotirlinga-route',title:'द्वादश ज्योतिर्लिंग',icon:'🔱',items:['सोमनाथ','मल्लिकार्जुन','महाकालेश्वर','ओंकारेश्वर','केदारनाथ','भीमाशंकर','काशी विश्वनाथ','त्र्यंबकेश्वर','वैद्यनाथ','नागेश्वर','रामेश्वरम्','घृष्णेश्वर'],note:'ज्योतिर्लिंग परंपरा का अध्ययन और तीर्थ-मानचित्र।'},
- {id:'sapta-puri',title:'सप्त पुरी',icon:'🌺',items:['अयोध्या','मथुरा','माया/हरिद्वार','काशी','कांची','अवंतिका/उज्जैन','द्वारका'],note:'सप्त पुरी की पारंपरिक सूची को एक साथ देखें।'}
+ {id:'char-dham',title:'चार धाम',icon:'🛕',items:[
+  {name:'बद्रीनाथ',detailId:'badrinath'},{name:'द्वारका',detailId:'dwarka'},{name:'जगन्नाथ पुरी',detailId:'puri'},{name:'रामेश्वरम्',detailId:'jyotirlinga'}
+ ],note:'चार प्रमुख धामों की परंपरा को एक यात्रा-दृश्य में देखें।',source:'परंपरा/सूची के संदर्भ अलग ग्रंथों और क्षेत्रीय परंपराओं में मिल सकते हैं।'},
+ {id:'jyotirlinga-route',title:'द्वादश ज्योतिर्लिंग',icon:'🔱',items:[
+  {name:'सोमनाथ'},{name:'मल्लिकार्जुन'},{name:'महाकालेश्वर'},{name:'ओंकारेश्वर'},{name:'केदारनाथ'},{name:'भीमाशंकर'},{name:'काशी विश्वनाथ'},{name:'त्र्यंबकेश्वर'},{name:'वैद्यनाथ'},{name:'नागेश्वर'},{name:'रामेश्वरम्',detailId:'jyotirlinga'},{name:'घृष्णेश्वर'}
+ ],note:'ज्योतिर्लिंग परंपरा का अध्ययन और तीर्थ-मानचित्र।',source:'द्वादश ज्योतिर्लिंग की सूची को परंपरा-संदर्भ के साथ प्रस्तुत किया जाएगा।'},
+ {id:'sapta-puri',title:'सप्त पुरी',icon:'🌺',items:[
+  {name:'अयोध्या'},{name:'मथुरा'},{name:'माया/हरिद्वार'},{name:'काशी'},{name:'कांची'},{name:'अवंतिका/उज्जैन'},{name:'द्वारका',detailId:'dwarka'}
+ ],note:'सप्त पुरी की पारंपरिक सूची को एक साथ देखें।',source:'सप्त पुरी की सूचियों में नाम/रूपांतर मिल सकते हैं; इन्हें स्रोत के साथ दिखाया जाएगा।'}
 ];
 const icons={loka:'🌌',deities:'🪔',tirtha:'🛕',vrata:'📿',texts:'📜',dharma:'☸️',darshana:'🕉️',heritage:'🏛️'};
 
@@ -203,11 +209,11 @@ function navigate(view,id){history.pushState({view,id},'',`#${view}/${id}`);rend
 
 function renderSacredMap(){
  destroy3D();
- app.innerHTML=`<main class="screen"><section class="hero"><div class="om">🗺️</div><h1>पवित्र भारत — Sacred Bharat</h1><p>तीर्थ और धामों की परंपराओं को स्रोत-सचेत अध्ययन यात्रा के रूप में देखें।</p></section><div class="route-grid">${sacredRoutes.map(r=>'<button class="route-card" data-route="'+r.id+'"><span>'+r.icon+'</span><b>'+r.title+'</b><small>'+r.items.join(' · ')+'</small><em>'+r.note+'</em></button>').join('')}</div><p class="note">सूचियाँ परंपरा/ग्रंथ के अनुसार बदल सकती हैं; यह दृश्य अध्ययन-मानचित्र है, आधिकारिक धार्मिक मानचित्र नहीं।</p></main>`;
+ app.innerHTML=`<main class="screen"><section class="hero"><div class="om">🗺️</div><h1>पवित्र भारत — Sacred Bharat</h1><p>तीर्थ और धामों की परंपराओं को स्रोत-सचेत अध्ययन यात्रा के रूप में देखें।</p></section><div class="route-grid">${sacredRoutes.map(r=>'<button class="route-card" data-route="'+r.id+'"><span>'+r.icon+'</span><b>'+r.title+'</b><small>'+r.items.map(x=>x.name).join(' · ')+'</small><em>'+r.note+'</em></button>').join('')}</div><p class="note">सूचियाँ परंपरा/ग्रंथ के अनुसार बदल सकती हैं; यह दृश्य अध्ययन-मानचित्र है, आधिकारिक धार्मिक मानचित्र नहीं।</p></main>`;
  setup3D('tirtha');
  document.querySelectorAll('[data-route]').forEach(b=>b.onclick=()=>renderRoute(b.dataset.route));
 }
-function renderRoute(id){const r=sacredRoutes.find(x=>x.id===id);if(!r)return;history.pushState({view:'route',id},'',`#route/${id}`);destroy3D();app.innerHTML=`<main class="detail"><button class="back" id="route-back">← वापस</button><section class="detail-content"><div class="section-icon">${r.icon}</div><h1>${r.title}</h1><p class="subtitle">${r.note}</p><article><h2>📍 यात्रा सूची</h2><div class="route-list">${r.items.map((x,i)=>'<div><span>'+(i+1)+'</span><b>'+x+'</b></div>').join('')}</div><p>यहाँ आगे प्रत्येक तीर्थ के लिए वास्तविक स्थान, मंदिर, परंपरा, प्रमुख ग्रंथ-संदर्भ और स्रोत-आधारित 3D hotspot जोड़े जाएंगे।</p></article></section></main>`;setup3D('tirtha');document.querySelector('#route-back').onclick=()=>history.back();}
+function renderRoute(id){const r=sacredRoutes.find(x=>x.id===id);if(!r)return;history.pushState({view:'route',id},'',`#route/${id}`);destroy3D();app.innerHTML=`<main class="detail"><button class="back" id="route-back">← वापस</button><section class="detail-content"><div class="section-icon">${r.icon}</div><h1>${r.title}</h1><p class="subtitle">${r.note}</p><article><h2>📍 यात्रा सूची</h2><div class="route-list">${r.items.map((x,i)=>'<div><span>'+(i+1)+'</span><b>'+x.name+'</b>'+(x.detailId?'<button class="route-detail" data-detail="'+x.detailId+'">विस्तृत दर्शन</button>':'')+'</div>').join('')}</div><p>${r.source}</p><p>यहाँ आगे प्रत्येक तीर्थ के लिए वास्तविक स्थान, मंदिर, परंपरा, प्रमुख ग्रंथ-संदर्भ और स्रोत-आधारित 3D hotspot जोड़े जाएंगे।</p></article></section></main>`;setup3D('tirtha');document.querySelector('#route-back').onclick=()=>history.back();document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.detail));}
 function renderState(){const s=history.state;if(s?.view==='section')renderSection(s.id);else if(s?.view==='detail')renderDetail(s.id);else if(s?.view==='route')renderRoute(s.id);else renderHome()}
 if(!history.state)history.replaceState({view:'home'},'','#home');
 addEventListener('popstate',renderState);renderState();
