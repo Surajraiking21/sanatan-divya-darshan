@@ -137,6 +137,8 @@ function renderHome(){
 const sacredButton=document.querySelector('#sacred-map');
 const templeButton=document.querySelector('#temple-explorer');
 if(templeButton) templeButton.onclick=()=>renderTempleExplorer('dwarka');
+const sacredGroupsButton=document.querySelector('#sacred-groups');
+if(sacredGroupsButton) sacredGroupsButton.onclick=()=>renderSacredGroups();
 if(sacredButton) sacredButton.onclick=()=>renderSacredMap();
  const search=document.querySelector('#search');
  const results=document.querySelector('#search-results');
@@ -215,14 +217,30 @@ function renderSacredMap(){
  setup3D('tirtha');
  document.querySelectorAll('[data-route]').forEach(b=>b.onclick=()=>renderRoute(b.dataset.route));
 }
+const sacredTempleGroups={
+ charDham:['badrinath','dwarka','puri','jyotirlinga'],
+ jyotirlinga:['somnath','mallikarjuna','mahakaleshwar','omkareshwar','kedarnath','bhimashankar','kashi','trimbakeshwar','baidyanath','nageshwar','rameshwaram','grishneshwar'],
+ shaktiPeetha:['kamakhya','kalighat','jwala','vaishno-devi','vindhyavasini','gayatri-shaktipeeth','ugratara']
+};
 const templeCatalog={
  dwarka:{name:'द्वारकाधीश मंदिर',region:'द्वारका, गुजरात',source:'Incredible India',detailId:'dwarka'},
  badrinath:{name:'बद्रीनाथ मंदिर',region:'बद्रीनाथ, उत्तराखंड',source:'Badrinath-Kedarnath Temple Committee / Uttarakhand Tourism',detailId:'badrinath'},
  puri:{name:'श्री जगन्नाथ मंदिर',region:'पुरी, ओडिशा',source:'Odisha Tourism',detailId:'puri'},
  kashi:{name:'श्री काशी विश्वनाथ मंदिर',region:'वाराणसी, उत्तर प्रदेश',source:'Kashi official portal / Incredible India',detailId:'kashi'},
  tirupati:{name:'श्री वेंकटेश्वर स्वामी मंदिर',region:'तिरुमला, आंध्र प्रदेश',source:'Incredible India',detailId:'tirupati'},
- kedarnath:{name:'केदारनाथ मंदिर',region:'केदारनाथ, उत्तराखंड',source:'Badrinath-Kedarnath Temple Committee / Incredible India',detailId:'jyotirlinga'}
+ kedarnath:{name:'केदारनाथ मंदिर',region:'केदारनाथ, उत्तराखंड',source:'Badrinath-Kedarnath Temple Committee / Incredible India',detailId:'jyotirlinga'},
+ somnath:{name:'सोमनाथ ज्योतिर्लिंग',region:'प्रभास पाटण, गुजरात',source:'Incredible India',detailId:'jyotirlinga'},
+ mahakaleshwar:{name:'महाकालेश्वर ज्योतिर्लिंग',region:'उज्जैन, मध्य प्रदेश',source:'Incredible India',detailId:'jyotirlinga'},
+ nageshwar:{name:'नागेश्वर ज्योतिर्लिंग',region:'द्वारका, गुजरात',source:'Incredible India',detailId:'jyotirlinga'},
+ rameshwaram:{name:'रामेश्वरम् ज्योतिर्लिंग',region:'रामेश्वरम्, तमिलनाडु',source:'Incredible India',detailId:'jyotirlinga'},
+ kamakhya:{name:'कामाख्या मंदिर',region:'गुवाहाटी, असम',source:'Assam Tourism / Incredible India'},
+ kalighat:{name:'कालीघाट मंदिर',region:'कोलकाता, पश्चिम बंगाल',source:'West Bengal Tourism / Incredible India'},
+ gayatri-shaktipeeth:{name:'गायत्री शक्तिपीठ',region:'द्वारका, गुजरात',source:'Incredible India'},
+ ugratara:{name:'उग्रतारा स्थान',region:'महिषी, बिहार',source:'Incredible India — Bihar Tourism'}
 };
+function renderSacredGroups(){
+ destroy3D();app.innerHTML=`<main class="screen"><section class="hero"><div class="om">🔱</div><h1>पवित्र तीर्थ संग्रह</h1><p>चार धाम, ज्योतिर्लिंग और शक्तिपीठ परंपराओं के लिए अलग explorer.</p></section><div class="route-grid">${Object.entries(sacredTempleGroups).map(([k,ids])=>'<button class="route-card" data-group="'+k+'"><span>'+({charDham:'🛕',jyotirlinga:'🔱',shaktiPeetha:'🌺'}[k])+'</span><b>'+({charDham:'चार धाम',jyotirlinga:'द्वादश ज्योतिर्लिंग',shaktiPeetha:'शक्तिपीठ'}[k])+'</b><small>'+ids.map(id=>(templeCatalog[id]?.name||id)).join(' · ')+'</small></button>').join('')}</div></main>`;setup3D('tirtha');document.querySelectorAll('[data-group]').forEach(b=>b.onclick=()=>renderSacredGroup(b.dataset.group));}
+function renderSacredGroup(group){const ids=sacredTempleGroups[group]||[];const title={charDham:'चार धाम',jyotirlinga:'द्वादश ज्योतिर्लिंग',shaktiPeetha:'शक्तिपीठ'}[group];history.pushState({view:'sacred-group',id:group},'',`#sacred/${group}`);destroy3D();app.innerHTML=`<main class="detail"><button class="back" id="sg-back">← वापस</button><section class="detail-content"><div class="section-icon">🛕</div><h1>${title}</h1><article><div class="temple-catalog">${ids.map(id=>{const x=templeCatalog[id]||{name:id,region:'भारत',source:'स्रोत जोड़ा जाएगा'};return '<button data-temple="'+id+'"><b>'+x.name+'</b><small>'+x.region+'</small></button>'}).join('')}</div></article></section></main>`;setup3D('tirtha');document.querySelectorAll('[data-temple]').forEach(b=>b.onclick=()=>renderTempleExplorer(b.dataset.temple));document.querySelector('#sg-back').onclick=()=>history.back();}
 function renderTempleExplorer(id='dwarka'){
  const p=detail(id)||detail('dwarka'); if(!p)return;
  history.pushState({view:'temple',id:p.id},'',`#temple/${p.id}`);
@@ -237,7 +255,7 @@ function renderTempleExplorer(id='dwarka'){
  document.querySelector('#temple-back').onclick=()=>history.back();
 }
 function renderRoute(id){const r=sacredRoutes.find(x=>x.id===id);if(!r)return;history.pushState({view:'route',id},'',`#route/${id}`);destroy3D();app.innerHTML=`<main class="detail"><button class="back" id="route-back">← वापस</button><section class="detail-content"><div class="section-icon">${r.icon}</div><h1>${r.title}</h1><p class="subtitle">${r.note}</p><article><h2>📍 यात्रा सूची</h2><div class="route-list">${r.items.map((x,i)=>'<div><span>'+(i+1)+'</span><b>'+x.name+'</b>'+(x.detailId?'<button class="route-detail" data-detail="'+x.detailId+'">विस्तृत दर्शन</button>':'')+'</div>').join('')}</div><p class="source-attribution">स्रोत: ${td.source||'प्रामाणिक पर्यटन/मंदिर स्रोत'}</p><p>${r.source}</p><p>यहाँ आगे प्रत्येक तीर्थ के लिए वास्तविक स्थान, मंदिर, परंपरा, प्रमुख ग्रंथ-संदर्भ और स्रोत-आधारित 3D hotspot जोड़े जाएंगे।</p></article></section></main>`;setup3D('tirtha');document.querySelector('#route-back').onclick=()=>history.back();document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.detail));}
-function renderState(){const s=history.state;if(s?.view==='section')renderSection(s.id);else if(s?.view==='detail')renderDetail(s.id);else if(s?.view==='route')renderRoute(s.id);else if(s?.view==='temple')renderTempleExplorer(s.id);else renderHome()}
+function renderState(){const s=history.state;if(s?.view==='section')renderSection(s.id);else if(s?.view==='detail')renderDetail(s.id);else if(s?.view==='route')renderRoute(s.id);else if(s?.view==='temple')renderTempleExplorer(s.id);else if(s?.view==='sacred-group')renderSacredGroup(s.id);else renderHome()}
 if(!history.state)history.replaceState({view:'home'},'','#home');
 addEventListener('popstate',renderState);renderState();
 
