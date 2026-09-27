@@ -46,4 +46,68 @@ const pilgrimageDetails={
   'vasant-panchami':{overview:'वसंत पंचमी वसंत ऋतु के आगमन और अनेक क्षेत्रों में सरस्वती-पूजा से जुड़ा पर्व है।',sources:['क्षेत्रीय पर्व परंपराएँ','सरस्वती उपासना साहित्य'],stories:['सरस्वती और विद्या से जुड़ी लोक-परंपराएँ'],worship:'विद्यारंभ, पुस्तकों/वाद्ययंत्रों की पूजा और सरस्वती वंदना प्रमुख हैं.',related:['saraswati','veda']}
 };
 Object.assign(details,pilgrimageDetails);
-export const getDetails=(id)=>details[id]||null;
+
+
+// Comprehensive catalogue fallback: every catalogue item receives a structured
+// Darshan page even when a tradition-specific research note has not yet been
+// expanded. This keeps the UI complete without inventing unsupported claims.
+import { sections, detail as getCatalogDetail } from './content.js';
+
+const sectionGuides = {
+  loka: {
+    focus:'लोक/धाम की अवधारणा को संबंधित वैदिक, पुराणिक या सम्प्रदायिक संदर्भ में समझना चाहिए। अलग ग्रंथों में नाम, स्वरूप और दार्शनिक अर्थ बदल सकते हैं।',
+    worship:'लोकों के विषय में वर्णन मुख्यतः ग्रंथ-अध्ययन, कथा, ध्यान और तीर्थ/उपासना-परंपरा के संदर्भ में आता है; इन्हें आधुनिक भौगोलिक स्थानों के समान मानना आवश्यक नहीं है।'
+  },
+  deities: {
+    focus:'इस देवता/दिव्य सत्ता का परिचय उसके नाम, रूप, गुण, प्रमुख ग्रंथ-संदर्भ और संबंधित सम्प्रदायों के संदर्भ में पढ़ा जाना चाहिए।',
+    worship:'पूजा, मंत्र, पर्व, मंदिर और उपासना-विधि क्षेत्र तथा सम्प्रदाय के अनुसार अलग हो सकती है।'
+  },
+  tirtha: {
+    focus:'यह तीर्थ धार्मिक भूगोल, कथा, मंदिर/घाट, यात्रा और स्थानीय परंपराओं के कई स्तरों से समझा जाता है।',
+    worship:'तीर्थ में दर्शन, स्नान, परिक्रमा, दान, जप या स्थानीय सेवा जैसी परंपराएँ मिल सकती हैं; वास्तविक नियम स्थान-विशेष पर निर्भर करते हैं।'
+  },
+  vrata: {
+    focus:'व्रत/पर्व का अर्थ तिथि, कथा, आराध्य, संकल्प और क्षेत्रीय रीति के साथ समझा जाता है। पंचांग और सम्प्रदाय के अनुसार तिथि तथा विधि में अंतर हो सकता है।',
+    worship:'उपवास, पूजा, कथा, जप, दान, जागरण या उत्सव जैसे अंग परंपरा के अनुसार अलग-अलग हो सकते हैं।'
+  },
+  texts: {
+    focus:'यह ग्रंथ/शास्त्र भारतीय धार्मिक और दार्शनिक साहित्य की एक विशिष्ट परंपरा में आता है। इसके पाठ, शाखाएँ, भाष्य और ऐतिहासिक संदर्भ अलग-अलग हो सकते हैं।',
+    worship:'ग्रंथों के साथ सामान्यतः अध्ययन, पाठ, श्रवण, मनन, भाष्य-अध्ययन और परंपरा-विशेष की साधना जुड़ी हो सकती है।'
+  },
+  dharma: {
+    focus:'यह एक धार्मिक, दार्शनिक या सांस्कृतिक परंपरा है जिसे उसके अपने ग्रंथों, आचार्यों, संस्थानों और अनुयायी-परंपराओं के संदर्भ में समझना चाहिए।',
+    worship:'आचार, पूजा, दर्शन, गुरु-परंपरा, मंदिर और साधना के रूप सम्प्रदाय तथा क्षेत्र के अनुसार बदलते हैं।'
+  }
+};
+
+function makeCatalogueDetail(item, section) {
+  const [id,title,summary,tradition,sourceContext]=item;
+  const guide=sectionGuides[section.id] || sectionGuides.dharma;
+  return {
+    overview:`${title} के बारे में: ${summary} ${guide.focus}`,
+    sources:[
+      `प्राथमिक/परंपरागत संदर्भ: ${sourceContext}`,
+      `परंपरा: ${tradition}`,
+      'विस्तृत अध्ययन के लिए संबंधित मूल ग्रंथ, प्रामाणिक भाष्य और मंदिर/सम्प्रदाय स्रोत देखे जाने चाहिए।'
+    ],
+    stories:[
+      `${title} से जुड़ी कथाएँ और व्याख्याएँ ${tradition} के संदर्भ में अलग रूपों में मिल सकती हैं।`,
+      'ऐप में कथा-सामग्री को परंपरा और स्रोत के साथ अलग-अलग दिखाने का ढाँचा रखा गया है, ताकि लोककथा, पुराणिक वर्णन और ऐतिहासिक जानकारी आपस में न मिलें।'
+    ],
+    worship:guide.worship,
+    related:[],
+    significance:`मुख्य महत्व: ${summary} यह विषय ${tradition} के व्यापक संदर्भ को समझने में उपयोगी है।`,
+    variations:'परंपरा में विविधता: अलग ग्रंथ, सम्प्रदाय और क्षेत्र एक ही विषय को अलग भाषा, कथा, अनुष्ठान या दार्शनिक दृष्टि से प्रस्तुत कर सकते हैं।',
+    learning:'अध्ययन नोट: इस पृष्ठ को स्रोत-सचेत ज्ञानकोश के रूप में रखा गया है। जहाँ निश्चित पाठभेद या परंपरा-भेद है, उसे अलग संदर्भ के साथ प्रस्तुत किया जाना चाहिए।'
+  };
+}
+
+// Fill every catalogue entry that does not yet have a bespoke research record.
+// Existing rich records above always take precedence.
+for (const section of sections) {
+  for (const item of section.items) {
+    if (!details[item[0]]) details[item[0]] = makeCatalogueDetail(item, section);
+  }
+}
+
+export const getDetails=(id)=>details[id]||getCatalogDetail(id);
