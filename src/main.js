@@ -15,7 +15,7 @@ const sceneThemes={
   tirtha:{color:0x4da6a6,emissive:0x073333,light:0x75e6d5,geometry:'torus'},
   vrata:{color:0xff9b62,emissive:0x431708,light:0xffc27d,geometry:'sphere'},
   texts:{color:0x8eb8ff,emissive:0x10284a,light:0x9cc7ff,geometry:'box'},
-  dharma:{color:0xc78cff,emissive:0x2b104a,light:0:0,geometry:'icosa'}
+  dharma:{color:0xc78cff,emissive:0x2b104a,light:0xd49cff,geometry:'icosa'}
 };
 
 function destroy3D(){
@@ -74,7 +74,7 @@ function setup3D(mode='home'){
  };
  addEventListener('pointermove',pointerHandler);
 
- canvas.style.pointerEvents='auto';
+ canvas.style.pointerEvents=mode==='home'?'none':'auto';
  canvas.setAttribute('aria-label','3D दिव्य दर्शन दृश्य — स्पर्श या क्लिक करें');
  canvas.onclick=()=>{pulse=1.22};
 
@@ -141,7 +141,7 @@ function renderDetail(id){
 
 function navigate(view,id){history.pushState({view,id},'',`#${view}/${id}`);renderState()}
 function renderState(){const s=history.state;if(s?.view==='section')renderSection(s.id);else if(s?.view==='detail')renderDetail(s.id);else renderHome()}
-if(!history.state)history.replaceState({view:'home'},'#home');
+if(!history.state)history.replaceState({view:'home'},'','#home');
 addEventListener('popstate',renderState);renderState();
 
 // Native Android back-button support: preserve the app navigation stack.
