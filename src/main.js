@@ -4,9 +4,18 @@ import {sections,detail} from './content.js';
 
 const app=document.querySelector('#app');
 let scene,camera,renderer,raf;
+let resizeHandler=null;
 const icons={loka:'🌌',deities:'🪔',tirtha:'🛕',vrata:'📿',texts:'📜',dharma:'☸️'};
 
+function destroy3D(){
+ cancelAnimationFrame(raf);
+ if(resizeHandler) removeEventListener('resize',resizeHandler);
+ if(renderer){renderer.dispose();renderer.forceContextLoss();renderer=null;}
+ scene=null;camera=null;
+}
+
 function setup3D(mode='home'){
+ destroy3D();
  const canvas=document.querySelector('#scene'); if(!canvas)return;
  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
  renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
@@ -24,7 +33,8 @@ function setup3D(mode='home'){
  cancelAnimationFrame(raf);
  const animate=()=>{core.rotation.x+=.002;core.rotation.y+=.004;ring.rotation.z+=.0015;renderer.render(scene,camera);raf=requestAnimationFrame(animate)};animate();
 }
-addEventListener('resize',()=>{if(renderer&&camera){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}});
+resizeHandler=()=>{if(renderer&&camera){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}};
+addEventListener('resize',resizeHandler);
 
 function renderHome(){
  app.innerHTML=`<main class="screen"><canvas id="scene"></canvas><section class="hero"><div class="om">ॐ</div><h1>Sanatan Divya Darshan</h1><p>सनातन परंपराओं की immersive digital यात्रा</p><div class="search-wrap"><input id="search" class="search" placeholder="🔎 लोक, भगवान, तीर्थ, पर्व या ग्रंथ खोजें..." autocomplete="off"/></div></section><section class="catalog">${sections.map(s=>`<button class="category" data-section="${s.id}"><span>${icons[s.id]}</span><b>${s.title}</b><small>${s.items.length} विषय • ज्ञान • दर्शन • परंपरा</small></button>`).join('')}</section><section id="search-results" class="search-results"></section><p class="note">यह ज्ञानकोश अलग-अलग ग्रंथों, संप्रदायों और क्षेत्रीय परंपराओं के मतभेदों को अलग-अलग दिखाने के लिए बनाया जा रहा है। धार्मिक/पारंपरिक दावों को जहाँ संभव हो, संबंधित ग्रंथ, संप्रदाय और क्षेत्रीय संदर्भ के साथ अलग-अलग दिखाया जाएगा।</p></main>`;
@@ -50,7 +60,7 @@ function renderSection(id){
 }
 function renderDetail(id){
  const p=detail(id)||detail('vishnu');
- app.innerHTML=`<main class="detail"><button class="back" id="back">← वापस</button><canvas id="scene"></canvas><div class="detail-content"><div class="section-icon">✨</div><h1>${p.title}</h1><p class="subtitle">${p.section}</p><article><h2>दिव्य परिचय</h2><p>${p.summary}</p><h2>परंपरा / संदर्भ</h2><p>${p.tradition||'विस्तृत संदर्भ जोड़े जाएंगे।'}</p><h2>स्रोत-संदर्भ</h2><p>${p.sources||'प्राथमिक ग्रंथ और विश्वसनीय संस्थागत/शोध स्रोतों के आधार पर विस्तार किया जाएगा।'}</p><h2>विस्तृत ज्ञान</h2><p>इस विषय के लिए ऐप में क्रमशः स्रोत-आधारित इतिहास, संबंधित ग्रंथ, प्रमुख कथाएँ, उपासना-परंपराएँ, प्रतीक, मंत्र/स्तोत्र जहाँ उपयुक्त हों, प्रमुख मंदिर और तीर्थ, पर्व-व्रत, क्षेत्रीय विविधताएँ तथा immersive 3D दृश्य जोड़े जाएंगे।</p><h2>परंपरा में विविधता</h2><p>जहाँ अलग-अलग ग्रंथ, संप्रदाय या क्षेत्र अलग विवरण देते हैं, उन्हें एक ही तथ्य की तरह मिलाने के बजाय अलग-अलग परंपराओं के रूप में प्रस्तुत किया जाएगा।</p></article></div></main>`;
+ app.innerHTML=`<main class="detail"><button class="back" id="back">← वापस</button><canvas id="scene"></canvas><div class="detail-content"><div class="section-icon">✨</div><h1>${p.title}</h1><p class="subtitle">${p.section}</p><article><h2>दिव्य परिचय</h2><p>${p.summary}</p><h2>परंपरा / संदर्भ</h2><p>${p.tradition||'विस्तृत संदर्भ जोड़े जाएंगे।'}</p><h2>स्रोत-संदर्भ</h2><p>${p.sources||'प्राथमिक ग्रंथ और विश्वसनीय संस्थागत/शोध स्रोतों के आधार पर विस्तार किया जाएगा।'}</p><div class="detail-grid"><section class="info-card"><h2>क्या जानेंगे</h2><ul><li>उत्पत्ति और परंपरागत परिचय</li><li>संबंधित ग्रंथ और स्रोत</li><li>प्रमुख कथाएँ और प्रतीक</li><li>उपासना, पर्व और क्षेत्रीय रूप</li><li>संबंधित मंदिर, तीर्थ और धाम</li></ul></section><section class="info-card"><h2>3D दर्शन</h2><p>इस विषय के लिए immersive दृश्य क्रमशः जोड़े जाएंगे। अभी ऊपर का दृश्य विषय के अनुरूप शांत ध्यान-केंद्रित अनुभव देता है।</p></section></div><h2>परंपरा में विविधता</h2><p>जहाँ अलग-अलग ग्रंथ, संप्रदाय या क्षेत्र अलग विवरण देते हैं, उन्हें एक ही तथ्य की तरह मिलाने के बजाय अलग-अलग परंपराओं के रूप में प्रस्तुत किया जाएगा।</p></article></div></main>`;
  setup3D(p.section==='सभी लोक'?'loka':'detail');
  document.querySelector('#back').onclick=()=>history.back();
 }
