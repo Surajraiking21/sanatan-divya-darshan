@@ -45,10 +45,15 @@ jobs:
       - name: Create Android project
         run: npx cap add android
 
+      - name: Install SVG converter
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y librsvg2-bin
+
       - name: Apply branded Android icon
         run: |
           mkdir -p android/app/src/main/res/drawable
-          convert -background none public/app-icon.svg -resize 512x512 android/app/src/main/res/drawable/ic_launcher.png
+          rsvg-convert -w 512 -h 512 public/app-icon.svg -o android/app/src/main/res/drawable/ic_launcher.png
           python - <<'PY'
           from pathlib import Path
           p=Path("android/app/src/main/AndroidManifest.xml")
@@ -61,13 +66,35 @@ jobs:
       - name: Sync Capacitor
         run: npx cap sync android
 
+      - name: Cache Gradle dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('android/**/*.gradle*', 'android/**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Build debug APK
         working-directory: android
-        run: ./gradlew --no-daemon assembleDebug
+        run: |
+          for attempt in 1 2 3; do
+            ./gradlew --no-daemon --stacktrace assembleDebug && exit 0
+            echo "Gradle debug build attempt $attempt failed; retrying..."
+            sleep 15
+          done
+          exit 1
 
       - name: Build release AAB
         working-directory: android
-        run: ./gradlew --no-daemon bundleRelease
+        run: |
+          for attempt in 1 2 3; do
+            ./gradlew --no-daemon --stacktrace bundleRelease && exit 0
+            echo "Gradle release build attempt $attempt failed; retrying..."
+            sleep 15
+          done
+          exit 1
 
       - name: Upload APK and AAB
         uses: actions/upload-artifact@v4
