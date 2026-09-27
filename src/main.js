@@ -220,7 +220,7 @@ const portalLink='https://vedicheritage.gov.in/introduction/';
 }
 
 function navigate(view,id){history.pushState({view,id},'',`#${view}/${id}`);renderState()}
-function goBack(){const state=history.state;if(state?.view&&state.view!=='home'&&history.length>1){goBack();return}if(state?.view!=='home'){history.replaceState({view:'home'},'','#home');renderHome()}}
+function goBack(){const state=history.state;if(state?.view&&state.view!=='home'&&history.length>1){history.back();return}if(state?.view!=='home'){history.replaceState({view:'home'},'','#home');renderHome()}}
 function makeVisualSvg(title,mode){
  const palettes={loka:['#6b4cff','#17102f','#b89cff'],deity:['#d78a2f','#2b1305','#ffe0a1'],tirtha:['#1e9b9b','#061e1e','#8ff3e6'],vrata:['#d65f35','#2a1008','#ffc08a'],texts:['#4c83d1','#091a31','#b9d7ff'],dharma:['#8b55cc','#1a0c2c','#e0b7ff'],darshana:['#d39a36','#241504','#ffe3a3'],heritage:['#4684bd','#091c2d','#b9ddff']};
  const p=palettes[mode]||palettes.loka;const safe=String(title).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
