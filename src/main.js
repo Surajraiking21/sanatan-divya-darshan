@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import './style.css';
 import {sections,detail} from './content.js';
+import {getDetails} from './details.js';
 
 const app=document.querySelector('#app');
 let scene,camera,renderer,raf;
@@ -129,14 +130,20 @@ function renderSection(id){
 
 function renderDetail(id){
  const p=detail(id)||detail('vishnu');
+ const rich=getDetails(p.id)||{};
+ const overview=rich.overview||p.summary;
+ const sourceList=(rich.sources||[]).map(x=>'<li>'+x+'</li>').join('')||'<li>'+p.sources+'</li>';
+ const storyList=(rich.stories||[]).map(x=>'<li>'+x+'</li>').join('')||'<li>विस्तृत कथाएँ चरणबद्ध रूप से जोड़ी जाएंगी।</li>';
+ const related= (rich.related||[]).map(x=>detail(x)).filter(Boolean).slice(0,6);
  const mode=p.section==='सभी लोक और दिव्य धाम'?'loka':
    p.section.includes('देवी-देवता')?'deity':
    p.section.includes('तीर्थ')?'tirtha':
    p.section.includes('व्रत')?'vrata':
    p.section.includes('ग्रंथ')?'texts':'dharma';
- app.innerHTML=`<main class="detail"><button class="back" id="back">← वापस</button><canvas id="scene"></canvas><div class="detail-content"><div class="darshan-badge">✦ स्पर्श / क्लिक करके 3D दर्शन अनुभव करें</div><div class="section-icon">✨</div><h1>${p.title}</h1><p class="subtitle">${p.section}</p><article><h2>दिव्य परिचय</h2><p>${p.summary}</p><h2>परंपरा / संदर्भ</h2><p>${p.tradition||'विस्तृत संदर्भ जोड़े जाएंगे।'}</p><h2>स्रोत-संदर्भ</h2><p>${p.sources||'प्राथमिक ग्रंथ और विश्वसनीय संस्थागत/शोध स्रोतों के आधार पर विस्तार किया जाएगा।'}</p><div class="detail-grid"><section class="info-card"><h2>क्या जानेंगे</h2><ul><li>उत्पत्ति और परंपरागत परिचय</li><li>संबंधित ग्रंथ और स्रोत</li><li>प्रमुख कथाएँ और प्रतीक</li><li>उपासना, पर्व और क्षेत्रीय रूप</li><li>संबंधित मंदिर, तीर्थ और धाम</li></ul></section><section class="info-card"><h2>3D दर्शन</h2><p>यह दृश्य अब स्पर्श/क्लिक प्रतिक्रिया, अलग-अलग विषयों के visual themes और हल्के parallax motion के साथ चलता है। आगे प्रत्येक विषय के लिए अलग immersive scene जोड़े जाएंगे।</p></section></div><h2>परंपरा में विविधता</h2><p>जहाँ अलग-अलग ग्रंथ, संप्रदाय या क्षेत्र अलग विवरण देते हैं, उन्हें एक ही तथ्य की तरह मिलाने के बजाय अलग-अलग परंपराओं के रूप में प्रस्तुत किया जाएगा।</p></article></div></main>`;
+ app.innerHTML=`<main class="detail"><button class="back" id="back">← वापस</button><canvas id="scene"></canvas><div class="detail-content"><div class="darshan-badge">✦ स्पर्श / क्लिक करके 3D दर्शन अनुभव करें</div><div class="section-icon">✨</div><h1>${p.title}</h1><p class="subtitle">${p.section}</p><article><h2>दिव्य परिचय</h2><p>${overview}</p><div class="detail-grid"><section class="info-card"><h2>📜 प्रमुख स्रोत</h2><ul>${sourceList}</ul></section><section class="info-card"><h2>📖 प्रमुख कथाएँ</h2><ul>${storyList}</ul></section></div><h2>परंपरा / संदर्भ</h2><p>${p.tradition||'विभिन्न ग्रंथ और संप्रदाय अपने-अपने संदर्भ में इस विषय की व्याख्या करते हैं।'}</p><h2>उपासना और अनुभव</h2><p>${rich.worship||'इस विषय की उपासना और परंपराएँ क्षेत्र, संप्रदाय और मंदिर के अनुसार अलग हो सकती हैं।'}</p><section class="info-card"><h2>✨ 3D दर्शन</h2><p>स्पर्श या क्लिक से दृश्य प्रतिक्रिया, parallax motion और विषयानुसार अलग visual theme सक्रिय होता है। आगे scene-specific hotspots और immersive स्थान जोड़े जाएंगे।</p></section>${related.length?'<h2>🔗 संबंधित दर्शन</h2><div class="related-grid">'+related.map(x=>'<button class="search-item related-item" data-related="'+x.id+'"><b>'+x.title+'</b><small>'+x.summary+'</small></button>').join('')+'</div>':''}<h2>स्रोत-संदर्भ</h2><p>${p.sources||'प्राथमिक ग्रंथ और विश्वसनीय संस्थागत/शोध स्रोतों के आधार पर विस्तार किया जाएगा।'}</p><h2>परंपरा में विविधता</h2><p>जहाँ अलग-अलग ग्रंथ, संप्रदाय या क्षेत्र अलग विवरण देते हैं, उन्हें एक ही तथ्य की तरह मिलाने के बजाय अलग-अलग परंपराओं के रूप में प्रस्तुत किया जाएगा।</p></article></div></main>`;
  setup3D(mode);
  document.querySelector('#back').onclick=()=>history.back();
+ document.querySelectorAll('[data-related]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.related));
 }
 
 function navigate(view,id){history.pushState({view,id},'',`#${view}/${id}`);renderState()}
