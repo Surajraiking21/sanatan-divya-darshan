@@ -37,7 +37,7 @@ function renderHome(){
    if(!q){results.innerHTML='';return}
    const matches=[];
    for(const s of sections) for(const x of s.items)
-     if((x[1]+' '+x[2]+' '+s.title).toLowerCase().includes(q)) matches.push({s,x});
+     if((x[1]+' '+x[2]+' '+(x[3]||'')+' '+(x[4]||'')+' '+s.title).toLowerCase().includes(q)) matches.push({s,x});
    results.innerHTML=matches.slice(0,30).map(({s,x})=>`<button class="search-item" data-id="${x[0]}"><b>${x[1]}</b><small>${s.title} • ${x[2]}</small></button>`).join('') || '<p class="no-results">कोई विषय नहीं मिला।</p>';
    results.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.id));
  };
