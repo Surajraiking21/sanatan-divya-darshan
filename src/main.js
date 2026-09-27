@@ -46,7 +46,14 @@ function setup3D(mode='home'){
  destroy3D();
  const canvas=document.querySelector('#scene'); if(!canvas)return;
  const theme=sceneThemes[mode]||sceneThemes.home;
- renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+ try{
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+ }catch(error){
+  console.warn('3D renderer unavailable; using the visual fallback.',error);
+  canvas.dataset.webglUnavailable='true';
+  canvas.style.display='none';
+  return;
+ }
  renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
  scene=new THREE.Scene();
  camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,100);
