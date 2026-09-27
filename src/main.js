@@ -27,9 +27,20 @@ function setup3D(mode='home'){
 addEventListener('resize',()=>{if(renderer&&camera){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}});
 
 function renderHome(){
- app.innerHTML=`<main class="screen"><canvas id="scene"></canvas><section class="hero"><div class="om">ॐ</div><h1>Sanatan Divya Darshan</h1><p>सनातन परंपराओं की immersive digital यात्रा</p></section><section class="catalog">${sections.map(s=>`<button class="category" data-section="${s.id}"><span>${icons[s.id]}</span><b>${s.title}</b><small>${s.items.length} विषय • ज्ञान • दर्शन • परंपरा</small></button>`).join('')}</section><p class="note">यह ज्ञानकोश अलग-अलग ग्रंथों, संप्रदायों और क्षेत्रीय परंपराओं के मतभेदों को अलग-अलग दिखाने के लिए बनाया जा रहा है।</p></main>`;
+ app.innerHTML=`<main class="screen"><canvas id="scene"></canvas><section class="hero"><div class="om">ॐ</div><h1>Sanatan Divya Darshan</h1><p>सनातन परंपराओं की immersive digital यात्रा</p><div class="search-wrap"><input id="search" class="search" placeholder="🔎 लोक, भगवान, तीर्थ, पर्व या ग्रंथ खोजें..." autocomplete="off"/></div></section><section class="catalog">${sections.map(s=>`<button class="category" data-section="${s.id}"><span>${icons[s.id]}</span><b>${s.title}</b><small>${s.items.length} विषय • ज्ञान • दर्शन • परंपरा</small></button>`).join('')}</section><section id="search-results" class="search-results"></section><p class="note">यह ज्ञानकोश अलग-अलग ग्रंथों, संप्रदायों और क्षेत्रीय परंपराओं के मतभेदों को अलग-अलग दिखाने के लिए बनाया जा रहा है। धार्मिक/पारंपरिक दावों को जहाँ संभव हो, संबंधित ग्रंथ, संप्रदाय और क्षेत्रीय संदर्भ के साथ अलग-अलग दिखाया जाएगा।</p></main>`;
  setup3D();
  document.querySelectorAll('[data-section]').forEach(b=>b.onclick=()=>navigate('section',b.dataset.section));
+ const search=document.querySelector('#search');
+ const results=document.querySelector('#search-results');
+ search.oninput=()=>{
+   const q=search.value.trim().toLowerCase();
+   if(!q){results.innerHTML='';return}
+   const matches=[];
+   for(const s of sections) for(const x of s.items)
+     if((x[1]+' '+x[2]+' '+s.title).toLowerCase().includes(q)) matches.push({s,x});
+   results.innerHTML=matches.slice(0,30).map(({s,x})=>`<button class="search-item" data-id="${x[0]}"><b>${x[1]}</b><small>${s.title} • ${x[2]}</small></button>`).join('') || '<p class="no-results">कोई विषय नहीं मिला।</p>';
+   results.querySelectorAll('[data-id]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.id));
+ };
 }
 function renderSection(id){
  const s=sections.find(x=>x.id===id)||sections[0];
