@@ -173,7 +173,6 @@ function renderDetail(id){
   'samaveda':'https://vedicheritage.gov.in/samhitas/samaveda-samhitas/',
   'shaunaka-samhita':'https://vedicheritage.gov.in/samhitas/atharvaveda-samhitas/shaunaka-samhita/',
   'vedic-chanting':'https://vedicheritage.gov.in/hi/introduction/prakriti-vikriti-veda-patha/'
-  'shaunaka-samhita':'https://vedicheritage.gov.in/samhitas/atharvaveda-samhitas/shaunaka-samhita/'
  };
  const sourceUrl=sourceLinks[p.id]||((p.section.includes('ग्रंथ')||p.id==='vedic-chanting')?'https://vedicheritage.gov.in/':null);
 const portalLink='https://vedicheritage.gov.in/introduction/';
