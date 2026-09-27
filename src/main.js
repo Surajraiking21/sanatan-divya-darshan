@@ -30,12 +30,11 @@ function setup3D(mode='home'){
  for(let i=0;i<count*3;i++)pos[i]=(Math.random()-.5)*32;
  stars.setAttribute('position',new THREE.BufferAttribute(pos,3));
  scene.add(new THREE.Points(stars,new THREE.PointsMaterial({color:0xffffff,size:.022})));
+ resizeHandler=()=>{if(renderer&&camera){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}};
+ addEventListener('resize',resizeHandler);
  cancelAnimationFrame(raf);
  const animate=()=>{core.rotation.x+=.002;core.rotation.y+=.004;ring.rotation.z+=.0015;renderer.render(scene,camera);raf=requestAnimationFrame(animate)};animate();
 }
-resizeHandler=()=>{if(renderer&&camera){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight)}};
-addEventListener('resize',resizeHandler);
-
 function renderHome(){
  app.innerHTML=`<main class="screen"><canvas id="scene"></canvas><section class="hero"><div class="om">ॐ</div><h1>Sanatan Divya Darshan</h1><p>सनातन परंपराओं की immersive digital यात्रा</p><div class="search-wrap"><input id="search" class="search" placeholder="🔎 लोक, भगवान, तीर्थ, पर्व या ग्रंथ खोजें..." autocomplete="off"/></div></section><section class="catalog">${sections.map(s=>`<button class="category" data-section="${s.id}"><span>${icons[s.id]}</span><b>${s.title}</b><small>${s.items.length} विषय • ज्ञान • दर्शन • परंपरा</small></button>`).join('')}</section><section id="search-results" class="search-results"></section><p class="note">यह ज्ञानकोश अलग-अलग ग्रंथों, संप्रदायों और क्षेत्रीय परंपराओं के मतभेदों को अलग-अलग दिखाने के लिए बनाया जा रहा है। धार्मिक/पारंपरिक दावों को जहाँ संभव हो, संबंधित ग्रंथ, संप्रदाय और क्षेत्रीय संदर्भ के साथ अलग-अलग दिखाया जाएगा।</p></main>`;
  setup3D();
