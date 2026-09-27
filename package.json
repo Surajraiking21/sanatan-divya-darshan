@@ -13,7 +13,8 @@
   "dependencies": {
     "three": "^0.180.0",
     "@capacitor/core": "^7.4.3",
-    "@capacitor/app": "^7.1.0"
+    "@capacitor/app": "^7.1.0",
+    "@capacitor/android": "^7.4.3"
   },
   "devDependencies": {
     "vite": "^7.1.7",
