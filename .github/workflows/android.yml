@@ -28,11 +28,13 @@ jobs:
           java-version: "21"
 
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@v4
+        with:
+          packages: "platform-tools"
 
       - name: Install Android SDK packages
         run: |
-          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+          sdkmanager "platforms;android-35" "build-tools;35.0.0"
           yes | sdkmanager --licenses >/dev/null || true
 
       - name: Install dependencies
@@ -49,11 +51,11 @@ jobs:
 
       - name: Build debug APK
         working-directory: android
-        run: ./gradlew assembleDebug
+        run: ./gradlew --no-daemon assembleDebug
 
       - name: Build release AAB
         working-directory: android
-        run: ./gradlew bundleRelease
+        run: ./gradlew --no-daemon bundleRelease
 
       - name: Upload APK and AAB
         uses: actions/upload-artifact@v4
