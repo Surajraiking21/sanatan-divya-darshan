@@ -47,3 +47,15 @@ function navigate(view,id){history.pushState({view,id},'',`#${view}/${id}`);rend
 function renderState(){const s=history.state;if(s?.view==='section')renderSection(s.id);else if(s?.view==='detail')renderDetail(s.id);else renderHome()}
 if(!history.state)history.replaceState({view:'home'},'','#home');
 addEventListener('popstate',renderState);renderState();
+
+// Native Android back-button support: preserve the app navigation stack.
+// On the home screen we stay in the app instead of unexpectedly closing it.
+async function setupNativeBackButton(){
+  try{
+    const {App}=await import('@capacitor/app');
+    await App.addListener('backButton',()=>{
+      if(history.state?.view && history.state.view!=='home') history.back();
+    });
+  }catch{}
+}
+setupNativeBackButton();
