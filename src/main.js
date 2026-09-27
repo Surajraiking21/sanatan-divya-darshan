@@ -135,6 +135,8 @@ function renderHome(){
  document.querySelector('#quiz').onclick=()=>renderQuiz();
  document.querySelector('#timeline').onclick=()=>renderTimeline();
 const sacredButton=document.querySelector('#sacred-map');
+const templeButton=document.querySelector('#temple-explorer');
+if(templeButton) templeButton.onclick=()=>renderTempleExplorer('dwarka');
 if(sacredButton) sacredButton.onclick=()=>renderSacredMap();
  const search=document.querySelector('#search');
  const results=document.querySelector('#search-results');
@@ -213,8 +215,19 @@ function renderSacredMap(){
  setup3D('tirtha');
  document.querySelectorAll('[data-route]').forEach(b=>b.onclick=()=>renderRoute(b.dataset.route));
 }
+function renderTempleExplorer(id='dwarka'){
+ const p=detail(id)||detail('dwarka'); if(!p)return;
+ history.pushState({view:'temple',id:p.id},'',`#temple/${p.id}`);
+ destroy3D();
+ const architecture=p.id==='dwarka'?'तटीय/क्षेत्रीय मंदिर-परंपरा':'मंदिर वास्तु और स्थानीय परंपरा';
+ app.innerHTML=`<main class="detail"><button class="back" id="temple-back">← वापस</button><section class="detail-content"><div class="section-icon">🛕</div><h1>Temple Explorer</h1><p class="subtitle">${p.title} — ${architecture}</p><article><h2>🚪 दर्शन-क्रम</h2><div class="temple-zones"><button data-zone="entrance">🚪 प्रवेश द्वार</button><button data-zone="mandapa">🏛️ मंडप</button><button data-zone="sanctum">🪔 गर्भगृह</button><button data-zone="shikhara">🔱 शिखर/विमान</button></div><div id="zone-info" class="info-card"><h2>प्रवेश द्वार</h2><p>यह immersive conceptual layer है। वास्तविक मंदिर की संरचना को प्रमाणित पुनर्निर्माण मानने के बजाय उपलब्ध स्रोतों के अनुसार अलग-अलग architectural elements दिखाए जाएंगे।</p></div></article><article><h2>📚 स्रोत-सचेत वास्तु</h2><p>नागर, द्रविड़, वेसर और क्षेत्रीय मंदिर-परंपराओं को एक ही शैली न मानकर अलग संदर्भों में रखा जाएगा।</p></article></section></main>`;
+ setup3D('tirtha');
+ const info={entrance:['प्रवेश द्वार','गोपुर/द्वार या प्रवेश क्षेत्र का परिचय—वास्तविक रूप मंदिर-विशेष पर निर्भर है।'],mandapa:['मंडप','सभा/पूजा और संचरण से जुड़े मंडपों की भूमिका मंदिर-विशेष के अनुसार अलग हो सकती है।'],sanctum:['गर्भगृह','मुख्य देवता की प्रतिष्ठा वाला पवित्र आंतरिक क्षेत्र; वास्तविक प्रवेश-नियम मंदिर और परंपरा पर निर्भर हैं।'],shikhara:['शिखर/विमान','ऊर्ध्व स्थापत्य तत्व; उत्तर भारतीय नागर और दक्षिण भारतीय द्रविड़ परंपराओं में रूप अलग होते हैं।']};
+ document.querySelectorAll('[data-zone]').forEach(b=>b.onclick=()=>{const x=info[b.dataset.zone];document.querySelector('#zone-info').innerHTML='<h2>'+x[0]+'</h2><p>'+x[1]+'</p>'});
+ document.querySelector('#temple-back').onclick=()=>history.back();
+}
 function renderRoute(id){const r=sacredRoutes.find(x=>x.id===id);if(!r)return;history.pushState({view:'route',id},'',`#route/${id}`);destroy3D();app.innerHTML=`<main class="detail"><button class="back" id="route-back">← वापस</button><section class="detail-content"><div class="section-icon">${r.icon}</div><h1>${r.title}</h1><p class="subtitle">${r.note}</p><article><h2>📍 यात्रा सूची</h2><div class="route-list">${r.items.map((x,i)=>'<div><span>'+(i+1)+'</span><b>'+x.name+'</b>'+(x.detailId?'<button class="route-detail" data-detail="'+x.detailId+'">विस्तृत दर्शन</button>':'')+'</div>').join('')}</div><p>${r.source}</p><p>यहाँ आगे प्रत्येक तीर्थ के लिए वास्तविक स्थान, मंदिर, परंपरा, प्रमुख ग्रंथ-संदर्भ और स्रोत-आधारित 3D hotspot जोड़े जाएंगे।</p></article></section></main>`;setup3D('tirtha');document.querySelector('#route-back').onclick=()=>history.back();document.querySelectorAll('[data-detail]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.detail));}
-function renderState(){const s=history.state;if(s?.view==='section')renderSection(s.id);else if(s?.view==='detail')renderDetail(s.id);else if(s?.view==='route')renderRoute(s.id);else renderHome()}
+function renderState(){const s=history.state;if(s?.view==='section')renderSection(s.id);else if(s?.view==='detail')renderDetail(s.id);else if(s?.view==='route')renderRoute(s.id);else if(s?.view==='temple')renderTempleExplorer(s.id);else renderHome()}
 if(!history.state)history.replaceState({view:'home'},'','#home');
 addEventListener('popstate',renderState);renderState();
 
