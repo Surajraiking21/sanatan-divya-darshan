@@ -17,7 +17,7 @@
 ## Content principles
 This project will not pretend that one list represents every Hindu tradition. Where scriptures, sampradayas or regions differ, the app will show the tradition/source context and distinguish documented history from devotional or traditional descriptions.
 
-The catalogue is designed to grow in phases rather than inventing unsupported details. Government tourism material is one useful source for pilgrimage and festival discovery, while primary texts and reputable institutional/temple sources should be preferred for religious claims. citeturn0search0turn0search3
+The catalogue is designed to grow in phases rather than inventing unsupported details. Government tourism material is one useful source for pilgrimage and festival discovery, while primary texts and reputable institutional/temple sources should be preferred for religious claims. 
 
 ## Development
 ```bash
