@@ -19,3 +19,5 @@
 
 .source-link{display:inline-flex;align-items:center;gap:8px;margin:8px 0 4px;padding:10px 14px;border:1px solid #ffffff22;border-radius:14px;background:#ffffff0b;color:#f5dca8;text-decoration:none;backdrop-filter:blur(10px)}
 .source-link:hover{background:#ffffff14}
+
+.source-status{margin:10px 0;padding:10px 14px;border-left:3px solid #f5dca8;background:#ffffff08;border-radius:10px;opacity:.82;line-height:1.6}
