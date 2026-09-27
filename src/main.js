@@ -167,7 +167,10 @@ function renderDetail(id){
    veda:'https://vedicheritage.gov.in/',
    upanishad:'https://vedicheritage.gov.in/upanishads/',
    'brihadaranyaka-upanishad':'https://vedicheritage.gov.in/upanishads/brihadaranyakopanishad/',
-   'aitareya-upanishad':'https://vedicheritage.gov.in/hi/upanishads/aitareyopanishad/'
+   'aitareya-upanishad':'https://vedicheritage.gov.in/hi/upanishads/aitareyopanishad/',
+  'brihadaranyaka-upanishad':'https://vedicheritage.gov.in/upanishads/brihadaranyakopanishad/',
+  'shukla-yajurveda':'https://vedicheritage.gov.in/samhitas/yajurveda/vajasneyi-madhyandina-samhita/',
+  'shaunaka-samhita':'https://vedicheritage.gov.in/samhitas/atharvaveda-samhitas/shaunaka-samhita/'
  };
  const sourceUrl=sourceLinks[p.id]||((p.section.includes('ग्रंथ')||p.id==='vedic-chanting')?'https://vedicheritage.gov.in/':null);
  const sourceButton=sourceUrl?'<a class="source-link" href="'+sourceUrl+'" target="_blank" rel="noopener noreferrer">🔎 आधिकारिक Vedic Heritage स्रोत खोलें</a>':'';
