@@ -177,7 +177,7 @@ function renderDetail(id){
  };
  const sourceUrl=sourceLinks[p.id]||((p.section.includes('ग्रंथ')||p.id==='vedic-chanting')?'https://vedicheritage.gov.in/':null);
 const portalLink='https://vedicheritage.gov.in/introduction/';
- const sourceButton=sourceUrl?'<a class="source-link" href="'+sourceUrl+'" target="_blank" rel="noopener noreferrer">🔎 आधिकारिक Vedic Heritage स्रोत खोलें</a>':'';<a class="source-link" href="'+portalLink+'" target="_blank" rel="noopener noreferrer">📚 Vedic Heritage Portal परिचय</a>
+ const sourceButton=(sourceUrl?'<a class="source-link" href="'+sourceUrl+'" target="_blank" rel="noopener noreferrer">🔎 आधिकारिक Vedic Heritage स्रोत खोलें</a>':'')+'<a class="source-link" href="'+portalLink+'" target="_blank" rel="noopener noreferrer">📚 Vedic Heritage Portal परिचय</a>';
  const mode=p.section==='सभी लोक और दिव्य धाम'?'loka':
    p.section.includes('देवी-देवता')?'deity':
    p.section.includes('तीर्थ')?'tirtha':
