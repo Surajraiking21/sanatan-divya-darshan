@@ -110,4 +110,18 @@ for (const section of sections) {
   }
 }
 
+// Scene metadata is kept separate from factual text so visual reconstructions can
+// clearly distinguish documented architecture from devotional/artistic interpretation.
+export const getSceneMeta=(id)=>{
+  const p=detail(id);
+  if(!p) return {type:'symbolic',label:'दिव्य प्रतीकात्मक दृश्य',confidence:'conceptual'};
+  const s=p.section;
+  if(s==='तीर्थ, धाम और पवित्र भूगोल') return {type:'sacred-place',label:'पवित्र स्थल का 3D प्रतीकात्मक दृश्य',confidence:'conceptual'};
+  if(s==='सभी लोक और दिव्य धाम') return {type:'realm',label:'लोक/धाम का 3D प्रतीकात्मक दृश्य',confidence:'conceptual'};
+  if(s==='देवी-देवता और दिव्य शक्तियाँ') return {type:'deity-symbolic',label:'देवता-प्रेरित 3D प्रतीकात्मक दृश्य',confidence:'conceptual'};
+  if(s==='व्रत, पर्व, उत्सव और संस्कार') return {type:'festival',label:'पर्व/व्रत का 3D प्रतीकात्मक दृश्य',confidence:'conceptual'};
+  if(s==='ग्रंथ, वेद, उपनिषद और दर्शन') return {type:'manuscript',label:'ग्रंथ/ज्ञान का 3D प्रतीकात्मक दृश्य',confidence:'conceptual'};
+  return {type:'tradition',label:'परंपरा का 3D प्रतीकात्मक दृश्य',confidence:'conceptual'};
+};
+
 export const getDetails=(id)=>details[id]||getCatalogDetail(id);
