@@ -18,6 +18,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
+          package-manager-cache: false
 
       - name: Setup Java
         uses: actions/setup-java@v4
