@@ -1,9 +1,22 @@
 {
-  "name":"sanatan-divya-darshan",
-  "private":true,
-  "version":"0.1.0",
-  "type":"module",
-  "scripts":{"dev":"vite","build":"vite build","preview":"vite preview"},
-  "dependencies":{"three":"^0.180.0"},
-  "devDependencies":{"vite":"^7.1.7"}
+  "name": "sanatan-divya-darshan",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "android:sync": "npm run build && npx cap sync android",
+    "android:open": "npx cap open android"
+  },
+  "dependencies": {
+    "three": "^0.180.0",
+    "@capacitor/core": "^7.4.3",
+    "@capacitor/app": "^7.1.0"
+  },
+  "devDependencies": {
+    "vite": "^7.1.7",
+    "@capacitor/cli": "^7.4.3"
+  }
 }
