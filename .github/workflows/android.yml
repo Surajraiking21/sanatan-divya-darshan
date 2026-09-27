@@ -3,6 +3,7 @@ name: Android APK and AAB
 on:
   workflow_dispatch:
   push:
+    branches: ["main"]
     tags: ["v*"]
 
 jobs:
@@ -58,6 +59,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: sanatan-divya-darshan-android
+          if-no-files-found: error
           path: |
             android/app/build/outputs/apk/debug/*.apk
             android/app/build/outputs/bundle/release/*.aab
