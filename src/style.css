@@ -8,3 +8,6 @@
 .info-card h2{margin-top:0}
 .info-card ul{margin:0;padding-left:20px;line-height:1.8}
 @media(max-width:700px){.detail-grid{grid-template-columns:1fr}}
+
+.darshan-badge{position:relative;z-index:3;width:max-content;max-width:100%;margin:16px auto 0;padding:8px 14px;border:1px solid #ffffff25;border-radius:999px;background:#ffffff10;color:#fff;opacity:.82;font-size:13px;text-align:center;backdrop-filter:blur(10px)}
+.detail #scene{touch-action:none;cursor:grab}.detail #scene:active{cursor:grabbing}
