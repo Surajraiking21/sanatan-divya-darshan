@@ -235,7 +235,7 @@ const templeCatalog={
  rameshwaram:{name:'रामेश्वरम् ज्योतिर्लिंग',region:'रामेश्वरम्, तमिलनाडु',source:'Incredible India',detailId:'jyotirlinga'},
  kamakhya:{name:'कामाख्या मंदिर',region:'गुवाहाटी, असम',source:'Assam Tourism / Incredible India'},
  kalighat:{name:'कालीघाट मंदिर',region:'कोलकाता, पश्चिम बंगाल',source:'West Bengal Tourism / Incredible India'},
- gayatri-shaktipeeth:{name:'गायत्री शक्तिपीठ',region:'द्वारका, गुजरात',source:'Incredible India'},
+ 'gayatri-shaktipeeth':{name:'गायत्री शक्तिपीठ',region:'द्वारका, गुजरात',source:'Incredible India'},
  ugratara:{name:'उग्रतारा स्थान',region:'महिषी, बिहार',source:'Incredible India — Bihar Tourism'}
 };
 function renderSacredGroups(){
