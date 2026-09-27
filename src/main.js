@@ -42,7 +42,7 @@ function destroy3D(){
  scene=null;camera=null;resizeHandler=null;pointerHandler=null;
 }
 
-function setup3D(mode='home'){
+function setup3D(mode='home', subjectId=null){
  destroy3D();
  const canvas=document.querySelector('#scene'); if(!canvas)return;
  const theme=sceneThemes[mode]||sceneThemes.home;
@@ -111,6 +111,7 @@ function setup3D(mode='home'){
  cancelAnimationFrame(raf);
  const animate=()=>{
    core.rotation.x+=.0025;
+   extras.forEach((o,i)=>{if(o&&o.isMesh)o.rotation.y+=(i%2?.002:-.001);});
    core.rotation.y+=.0045;
    ring.rotation.z+=.0018;
    innerRing.rotation.x+=.0012;
@@ -216,7 +217,7 @@ const portalLink='https://vedicheritage.gov.in/introduction/';
    p.section.includes('मंदिर, कला')?'heritage':'dharma';
  const visualSrc=makeVisualSvg(p.title,mode);
  app.innerHTML=`<main class="detail"><button class="back" id="back">← वापस</button><canvas id="scene"></canvas><div class="detail-content"><div class="darshan-badge">✦ स्पर्श / क्लिक करके 3D दर्शन अनुभव करें</div><div class="section-icon">✨</div><h1>${p.title}</h1><div class="detail-actions"><button id="fav-btn">🤍 प्रिय में जोड़ें</button><button id="share-btn">🔗 साझा करें</button></div><p class="subtitle">${p.summary||"इस विषय का संक्षिप्त सार यहाँ उपलब्ध है।"}</p><div class="topic-meta"><span class="topic-chip">📂 ${p.section}</span><span class="topic-chip">🕉️ ${p.tradition||"सनातन परंपरा"}</span></div><section class="visual-hero"><img src="${visualSrc}" alt="${escapeHtml(p.title)} का 3D प्रतीकात्मक दृश्य"><div><b>✨ ${sceneMeta.label}</b><small>${escapeHtml(rich.visual||"इस विषय के लिए अलग प्रतीकात्मक visual बनाया गया है।")}</small></div></section><article><h2>दिव्य परिचय</h2><p>${overview}</p><div class="detail-grid"><section class="info-card"><h2>📜 प्रमुख स्रोत</h2><ul>${sourceList}</ul></section><section class="info-card"><h2>📖 प्रमुख कथाएँ</h2><ul>${storyList}</ul></section></div><h2>परंपरा / संदर्भ</h2><p>${p.tradition||'विभिन्न ग्रंथ और संप्रदाय अपने-अपने संदर्भ में इस विषय की व्याख्या करते हैं।'}</p><h2>उपासना और अनुभव</h2><p>${rich.worship||'इस विषय की उपासना और परंपराएँ क्षेत्र, संप्रदाय और मंदिर के अनुसार अलग हो सकती हैं।'}</p><section class="info-card"><h2>✨ 3D दर्शन</h2><p>${sceneMeta.label}</p><p>दृश्य की प्रकृति: प्रतीकात्मक/कल्पनात्मक — इसे ऐतिहासिक या शास्त्रीय वास्तु का प्रमाणित पुनर्निर्माण न समझें।</p><p>हर title के लिए category-specific 3D प्रतीक, depth layers और title label दिखाया जाता है।</p></section>${rich.facts?.length?'<section class="info-card"><h2>🧭 मुख्य तथ्य</h2><ul>'+rich.facts.map(x=>'<li>'+x+'</li>').join('')+'</ul></section>':''}${rich.studySections?.length?'<section class="info-card"><h2>📚 इस विषय के अंदर</h2><ul>'+rich.studySections.map(x=>'<li>'+x+'</li>').join('')+'</ul></section>':''}${related.length?'<h2>🔗 संबंधित दर्शन</h2><div class="related-grid">'+related.map(x=>'<button class="search-item related-item" data-related="'+x.id+'"><b>'+x.title+'</b><small>'+x.summary+'</small></button>').join('')+'</div>':''}<h2>स्रोत-संदर्भ</h2><p>${p.sources||'प्राथमिक ग्रंथ और विश्वसनीय संस्थागत/शोध स्रोतों के आधार पर विस्तार किया जाएगा।'}</p><p class="source-status">${sourceLabel}</p>${sourceButton}<h2>परंपरा में विविधता</h2><p>जहाँ अलग-अलग ग्रंथ, संप्रदाय या क्षेत्र अलग विवरण देते हैं, उन्हें एक ही तथ्य की तरह मिलाने के बजाय अलग-अलग परंपराओं के रूप में प्रस्तुत किया जाएगा।</p></article></div></main>`;
- setup3D(mode);
+ setup3D(mode,p.id);
  document.querySelector('#back').onclick=()=>goBack();
  document.querySelectorAll('[data-related]').forEach(b=>b.onclick=()=>navigate('detail',b.dataset.related));
 }
