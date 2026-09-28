@@ -67,6 +67,7 @@ Object.assign(details,pilgrimageDetails);
 // Darshan page even when a tradition-specific research note has not yet been
 // expanded. This keeps the UI complete without inventing unsupported claims.
 import { sections, detail as getCatalogDetail } from './content.js';
+import { deepFor } from './rich-details.js';
 
 const sectionGuides = {
   loka: {
@@ -123,6 +124,7 @@ function makeCatalogueDetail(item, section) {
   const [id,title,summary,tradition,sourceContext]=item;
   const guide=sectionGuides[section.id] || sectionGuides.dharma;
   const loka=lokaProfiles[id];
+  const deep=deepFor(id);
 
   const sectionLens={
     loka:['मूल अवधारणा और लोक-क्रम','ग्रंथीय ब्रह्माण्ड-वर्णन','संबंधित लोक/धाम और प्राणी-वर्णन','काल, कर्म और पुनर्जन्म के संदर्भ','विभिन्न दर्शन/सम्प्रदायों की व्याख्या','धार्मिक प्रतीक और 3D दृश्य','आज अध्ययन में इसे कैसे समझें'],
@@ -179,6 +181,25 @@ function makeCatalogueDetail(item, section) {
     ? 'आज '+title+' को मुख्यतः पारंपरिक धार्मिक/दार्शनिक ब्रह्माण्ड-वर्णन के रूप में पढ़ा जाता है। आधुनिक विज्ञान से तुलना करते समय दोनों के प्रश्न, विधि और प्रमाण-प्रणाली अलग रखी जानी चाहिए।'
     : 'आज '+title+' मंदिरों, पर्वों, पाठ, कथा, तीर्थ, कला, संगीत, दर्शन, शिक्षा और डिजिटल अध्ययन जैसी जीवित परंपराओं में अलग-अलग रूपों में दिखाई देता है। क्षेत्र और सम्प्रदाय के अनुसार व्यवहार बदल सकता है।';
 
+  const detailSections = deep ? [
+    ['🪷 परिचय और पहचान', deep.aliases ? title+' के प्रमुख नाम/संबोधन: '+deep.aliases : overview],
+    ['✨ स्वरूप, रूप और मुख्य विषय', deep.forms+' मुख्य विषय: '+deep.themes],
+    ['📖 प्रमुख कथा और ग्रंथ-संदर्भ', deep.stories],
+    ['🛕 उपासना, साधना और परंपरा', deep.worship],
+    ['🪔 पर्व, उत्सव और जुड़े अवसर', deep.festivals],
+    ['🔱 प्रतीक, आयुध और संबंधित स्थान', deep.symbols+' प्रमुख स्थान/संबंध: '+deep.places],
+    ['🌺 अध्ययन-बिंदु और आज का संदर्भ', deep.lesson]
+  ] : [
+    ['🪷 इस विषय की पहचान', title+' — '+summary+' यह '+tradition+' के संदर्भ में समझा जाता है।'],
+    ['📚 प्रमुख अवधारणाएँ', studySections.slice(0,3).join(' • ')+'। '+guide.focus],
+    ['📖 ग्रंथ, कथा और स्रोत', 'मुख्य संदर्भ: '+sourceContext+'। '+stories[0]+' '+stories[1]],
+    ['🛕 परंपरा, साधना और व्यवहार', guide.worship+' '+(richSafe(guide.worship, title)),
+    ['🕰️ विकास और विविधता', 'समय, क्षेत्र और संप्रदाय के अनुसार इस विषय के नाम, अर्थ, अनुष्ठान या प्रस्तुति में परिवर्तन/विविधता मिल सकती है।'],
+    ['🎨 प्रतीक और 3D अध्ययन', '3D दृश्य इस विषय का प्रतीकात्मक/शैक्षिक पुनर्सृजन है। वास्तविक मूर्ति, वास्तु या ऐतिहासिक पुनर्निर्माण का प्रमाण नहीं। '+(loka?.visual||'विषय के प्रमुख प्रतीकों के आधार पर layered visual बनाया गया है।')],
+    ['🌍 आज के संदर्भ में', presentDay]
+  ];
+  function richSafe(_text, _title){ return _title+' से जुड़े स्थानीय, धार्मिक और सांस्कृतिक व्यवहार क्षेत्रानुसार बदल सकते हैं।'; }
+
   return {
     overview: title+' — '+summary+' यह विषय '+tradition+' के संदर्भ में अध्ययन किया जा सकता है। '+guide.focus,
     sources:[
@@ -196,7 +217,8 @@ function makeCatalogueDetail(item, section) {
     studySections,
     visual:loka?.visual || title+' के लिए विषय-विशिष्ट 3D प्रतीकात्मक दृश्य: '+summary,
     timeline,
-    presentDay
+    presentDay,
+    detailSections
   };
 }
 // Fill every catalogue entry that does not yet have a bespoke research record.
