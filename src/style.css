@@ -10,7 +10,7 @@
 @media(max-width:700px){.detail-grid{grid-template-columns:1fr}}
 
 .darshan-badge{position:relative;z-index:3;width:max-content;max-width:100%;margin:16px auto 0;padding:8px 14px;border:1px solid #ffffff25;border-radius:999px;background:#ffffff10;color:#fff;opacity:.82;font-size:13px;text-align:center;backdrop-filter:blur(10px)}
-.detail #scene{touch-action:none;cursor:grab}.detail #scene:active{cursor:grabbing}
+.detail #scene{touch-action:none;cursor:grab;pointer-events:auto;z-index:1}.detail #scene:active{cursor:grabbing}.item em{font-size:11px;color:#f5dca8;opacity:.78;font-style:normal;margin-top:2px}.detail-section-card b{font-size:15px}
 
 
 .quick-tools{position:relative;z-index:3;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;max-width:960px;margin:0 auto;padding:0 20px 20px}.tool-card,.detail-actions button{border:1px solid #ffffff24;border-radius:18px;background:#ffffff0c;color:#fff;backdrop-filter:blur(14px);cursor:pointer;padding:15px}.tool-card{display:flex;flex-direction:column;gap:5px;text-align:left;transition:.2s}.tool-card:first-letter{font-size:24px}.tool-card b{font-size:15px}.tool-card small{opacity:.62}.tool-card:active,.detail-actions button:active{transform:scale(.98)}.detail-actions{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin:14px 0}.detail-actions button{font-size:14px}@media(max-width:700px){.quick-tools{grid-template-columns:1fr}.tool-card{min-height:76px}}
