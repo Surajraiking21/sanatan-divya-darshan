@@ -39,93 +39,153 @@ function destroy3D(){
  cancelAnimationFrame(raf);
  if(resizeHandler) removeEventListener('resize',resizeHandler);
  if(pointerHandler) removeEventListener('pointermove',pointerHandler);
- if(renderer){renderer.dispose();renderer.forceContextLoss();renderer=null;}
- scene=null;camera=null;resizeHandler=null;pointerHandler=null;
+ if(renderer){
+   try{renderer.dispose();}catch{}
+   try{renderer.forceContextLoss();}catch{}
+   renderer=null;
+ }
+ if(scene) scene.traverse(o=>{
+   if(o.geometry)try{o.geometry.dispose()}catch{}
+   if(o.material){
+     const mats=Array.isArray(o.material)?o.material:[o.material];
+     mats.forEach(m=>{try{m.dispose()}catch{}});
+   }
+ });
+ scene=null;camera=null;resizeHandler=null;pointerHandler=null;extras.length=0;
 }
 
 function setup3D(mode='home', subjectId=null){
  destroy3D();
- const canvas=document.querySelector('#scene'); if(!canvas)return;
+ const canvas=document.querySelector('#scene'); if(!canvas||typeof THREE==='undefined')return;
  const theme=sceneThemes[mode]||sceneThemes.home;
  try{
-  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true});
+  renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'high-performance'});
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio||1,1.6));
+  renderer.setSize(innerWidth,innerHeight,false);
  }catch(error){
-  console.warn('3D renderer unavailable; using the visual fallback.',error);
+  console.warn('3D renderer unavailable; using visual fallback.',error);
   canvas.dataset.webglUnavailable='true';
-  canvas.style.display='none';
   return;
  }
- renderer.setPixelRatio(Math.min(devicePixelRatio,2)); renderer.setSize(innerWidth,innerHeight);
- scene=new THREE.Scene();
- camera=new THREE.PerspectiveCamera(60,innerWidth/innerHeight,.1,100);
- camera.position.z=5;
- scene.add(new THREE.AmbientLight(0xffffff,.72));
- const light=new THREE.PointLight(theme.light,2.8,30);
- light.position.set(2,3,5); scene.add(light);
 
- let geometry;
- if(theme.geometry==='sphere') geometry=new THREE.SphereGeometry(1.08,48,32);
- else if(theme.geometry==='torus') geometry=new THREE.TorusKnotGeometry(.82,.22,96,16);
- else if(theme.geometry==='box') geometry=new THREE.BoxGeometry(1.55,1.55,1.55);
- else geometry=new THREE.IcosahedronGeometry(mode==='loka'?1.25:1.05,3);
+ try{
+  scene=new THREE.Scene();
+  scene.fog=new THREE.FogExp2(theme.color||0x120b2b,.035);
+  camera=new THREE.PerspectiveCamera(58,innerWidth/innerHeight,.1,120);
+  camera.position.set(0,0,5);
 
- const core=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({
-   color:theme.color,emissive:theme.emissive,metalness:.48,roughness:.24
- }));
- scene.add(core);
+  scene.add(new THREE.AmbientLight(0xffffff,.65));
+  const light=new THREE.PointLight(theme.light,3.2,36);
+  light.position.set(2.5,3.5,5); scene.add(light);
+  const rim=new THREE.PointLight(theme.emissive||theme.light,2.2,28);
+  rim.position.set(-3,-1,2); scene.add(rim);
 
- const ring=new THREE.Mesh(
-   new THREE.TorusGeometry(1.72,.018,12,128),
-   new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.42})
- );
- ring.rotation.x=Math.PI/2; scene.add(ring);
+  let geometry;
+  if(theme.geometry==='sphere') geometry=new THREE.SphereGeometry(1.08,40,28);
+  else if(theme.geometry==='torus') geometry=new THREE.TorusKnotGeometry(.82,.22,72,14);
+  else if(theme.geometry==='box') geometry=new THREE.BoxGeometry(1.55,1.55,1.55);
+  else geometry=new THREE.IcosahedronGeometry(mode==='loka'?1.25:1.05,2);
 
- const innerRing=new THREE.Mesh(
-   new THREE.TorusGeometry(1.25,.012,10,96),
-   new THREE.MeshBasicMaterial({color:theme.light,transparent:true,opacity:.32})
- );
- innerRing.rotation.y=Math.PI/3; scene.add(innerRing);
+  const core=new THREE.Mesh(geometry,new THREE.MeshStandardMaterial({
+    color:theme.color,emissive:theme.emissive,emissiveIntensity:1.15,metalness:.5,roughness:.22
+  }));
+  scene.add(core);
 
- const stars=new THREE.BufferGeometry(),count=1400,pos=new Float32Array(count*3);
- for(let i=0;i<count*3;i++)pos[i]=(Math.random()-.5)*32;
- stars.setAttribute('position',new THREE.BufferAttribute(pos,3));
- scene.add(new THREE.Points(stars,new THREE.PointsMaterial({color:0xffffff,size:.022,transparent:true,opacity:.75})));
+  const halo=new THREE.Mesh(
+    new THREE.SphereGeometry(1.38,32,20),
+    new THREE.MeshBasicMaterial({color:theme.light,transparent:true,opacity:.055,side:THREE.BackSide})
+  );
+  scene.add(halo); extras.push(halo);
 
- let targetX=0,targetY=0,pulse=1;
- pointerHandler=(e)=>{
-   targetX=(e.clientX/innerWidth-.5)*.7;
-   targetY=(e.clientY/innerHeight-.5)*.45;
- };
- addEventListener('pointermove',pointerHandler);
+  const ring=new THREE.Mesh(
+    new THREE.TorusGeometry(1.72,.024,12,128),
+    new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:.48})
+  );
+  ring.rotation.x=Math.PI/2; scene.add(ring); extras.push(ring);
 
- canvas.style.pointerEvents=mode==='home'?'none':'auto';
- canvas.setAttribute('aria-label','3D दिव्य दर्शन दृश्य — स्पर्श या क्लिक करें');
- canvas.onclick=()=>{pulse=1.22};
+  const ring2=new THREE.Mesh(
+    new THREE.TorusGeometry(2.08,.012,8,128),
+    new THREE.MeshBasicMaterial({color:theme.light,transparent:true,opacity:.3})
+  );
+  ring2.rotation.x=Math.PI/3; scene.add(ring2); extras.push(ring2);
 
- resizeHandler=()=>{if(renderer&&camera){
-   camera.aspect=innerWidth/innerHeight;
-   camera.updateProjectionMatrix();
-   renderer.setSize(innerWidth,innerHeight);
- }};
- addEventListener('resize',resizeHandler);
+  const innerRing=new THREE.Mesh(
+    new THREE.TorusGeometry(1.25,.014,10,96),
+    new THREE.MeshBasicMaterial({color:theme.light,transparent:true,opacity:.38})
+  );
+  innerRing.rotation.y=Math.PI/3; scene.add(innerRing); extras.push(innerRing);
 
- cancelAnimationFrame(raf);
- const animate=()=>{
-   core.rotation.x+=.0025;
-   extras.forEach((o,i)=>{if(o&&o.isMesh)o.rotation.y+=(i%2?.002:-.001);});
-   core.rotation.y+=.0045;
-   ring.rotation.z+=.0018;
-   innerRing.rotation.x+=.0012;
-   innerRing.rotation.z-=.001;
-   camera.position.x+=(targetX-camera.position.x)*.035;
-   camera.position.y+=(-targetY-camera.position.y)*.035;
-   camera.lookAt(0,0,0);
-   pulse+=(1-pulse)*.055;
-   core.scale.setScalar(pulse);
-   renderer.render(scene,camera);
-   raf=requestAnimationFrame(animate);
- };
- animate();
+  const starCount=mode==='home'?1100:1700;
+  const stars=new THREE.BufferGeometry(),pos=new Float32Array(starCount*3);
+  for(let i=0;i<starCount*3;i++)pos[i]=(Math.random()-.5)*34;
+  stars.setAttribute('position',new THREE.BufferAttribute(pos,3));
+  const starPoints=new THREE.Points(stars,new THREE.PointsMaterial({color:0xffffff,size:mode==='home'?.024:.032,transparent:true,opacity:.78}));
+  scene.add(starPoints); extras.push(starPoints);
+
+  // Extra orbiting particles create depth without requiring image assets.
+  const pCount=mode==='home'?180:360;
+  const pp=new THREE.BufferGeometry(),pv=new Float32Array(pCount*3);
+  for(let i=0;i<pCount;i++){
+    const r=2.4+Math.random()*4.5, a=Math.random()*Math.PI*2, z=(Math.random()-.5)*3.2;
+    pv[i*3]=Math.cos(a)*r; pv[i*3+1]=Math.sin(a)*r; pv[i*3+2]=z;
+  }
+  pp.setAttribute('position',new THREE.BufferAttribute(pv,3));
+  const orbit=new THREE.Points(pp,new THREE.PointsMaterial({color:theme.light,size:.045,transparent:true,opacity:.55}));
+  scene.add(orbit); extras.push(orbit);
+
+  let targetX=0,targetY=0,pulse=1;
+  pointerHandler=(e)=>{
+    targetX=(e.clientX/innerWidth-.5)*.65;
+    targetY=(e.clientY/innerHeight-.5)*.4;
+  };
+  addEventListener('pointermove',pointerHandler,{passive:true});
+  canvas.style.pointerEvents=mode==='home'?'none':'auto';
+  canvas.setAttribute('aria-label','3D दिव्य दर्शन दृश्य — स्पर्श या क्लिक करें');
+  canvas.onclick=()=>{pulse=1.2};
+
+  resizeHandler=()=>{
+    if(!renderer||!camera)return;
+    try{
+      camera.aspect=innerWidth/innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(innerWidth,innerHeight,false);
+    }catch{}
+  };
+  addEventListener('resize',resizeHandler,{passive:true});
+
+  let last=performance.now();
+  const animate=(now=performance.now())=>{
+    if(!renderer||!scene||!camera)return;
+    try{
+      const dt=Math.min((now-last)/16.67,2); last=now;
+      core.rotation.x+=.0025*dt;
+      core.rotation.y+=.0048*dt;
+      halo.rotation.y-=.0012*dt;
+      ring.rotation.z+=.0018*dt;
+      ring2.rotation.y-=.0013*dt;
+      innerRing.rotation.x+=.0014*dt;
+      innerRing.rotation.z-=.0011*dt;
+      starPoints.rotation.y+=.00016*dt;
+      orbit.rotation.y+=.0012*dt;
+      orbit.rotation.x+=.00045*dt;
+      camera.position.x+=(targetX-camera.position.x)*.035;
+      camera.position.y+=(-targetY-camera.position.y)*.035;
+      camera.lookAt(0,0,0);
+      pulse+=(1-pulse)*.055;
+      core.scale.setScalar(pulse);
+      halo.scale.setScalar(1+(pulse-1)*.45);
+      renderer.render(scene,camera);
+      raf=requestAnimationFrame(animate);
+    }catch(error){
+      console.warn('3D animation stopped safely.',error);
+      cancelAnimationFrame(raf);
+    }
+  };
+  raf=requestAnimationFrame(animate);
+ }catch(error){
+  console.warn('3D scene setup failed safely.',error);
+  destroy3D();
+ }
 }
 
 const FAVORITES_KEY='sdd-favorites';
